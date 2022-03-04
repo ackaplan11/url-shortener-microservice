@@ -1,12 +1,15 @@
 require('dotenv').config();
+const dns = require('dns')
 const express = require('express');
 const cors = require('cors');
+const bodyParser = require('body-parser')
 const app = express();
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
 
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: false }))
 
 app.use('/public', express.static(`${process.cwd()}/public`));
 
@@ -18,6 +21,19 @@ app.get('/', function(req, res) {
 app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
+
+app.use(async (req, res, next) => {
+  dns.lookup(req.body.url, {family: 0}, (err, address, family) => {
+    if (err) {
+      console.error(err)
+      return res.json({ error: 'invalid url' })
+    } else {
+      next()
+    }
+  })
+}).post('/api/shorturl', (req, res) => {
+  res.json({url: 'hello'})
+})
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
