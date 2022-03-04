@@ -26,13 +26,17 @@ app.use(async (req, res, next) => {
   dns.lookup(req.body.url, {family: 0}, (err, address, family) => {
     if (err) {
       console.error(err)
+      next()
       return res.json({ error: 'invalid url' })
     } else {
-      next()
+      
     }
   })
 }).post('/api/shorturl', (req, res) => {
-  res.json({url: 'hello'})
+  res.json({
+    original_url: req.body.url,
+    short_url: "hi"
+  })
 })
 
 app.listen(port, function() {
