@@ -26,7 +26,7 @@ app.use(async (req, res, next) => {
   dns.lookup(req.body.url, {family: 0}, (err, address, family) => {
     if (err) {
       console.error(err)
-      //next() breaking change
+      //next() breaking change -- 
       return res.json({ error: 'invalid url' })
     } else {
       
