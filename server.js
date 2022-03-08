@@ -23,15 +23,17 @@ app.get('/api/hello', function(req, res) {
 });
 
 app.use(async (req, res, next) => {
-  dns.lookup(req.body.url, {family: 0}, (err, address, family) => {
-    if (err) {
-      console.error(err)
-      //next() breaking change -- 
-      return res.json({ error: 'invalid url' })
-    } else {
-      
-    }
-  })
+  console.log(req.body.url)
+  const options = {
+    family: 6,
+    hints: dns.ADDRCONFIG | dns.V4MAPPED,
+  };
+  const hostname = req.body.url.replace(/^https?:\/\//, '')
+  dns.lookup(hostname, options, (err, address, family) => {
+    console.log('address: %j family: IPv%s', address, family)
+    console.log(err)
+    next()
+  });
 }).post('/api/shorturl', (req, res) => {
   res.json({
     original_url: req.body.url,
