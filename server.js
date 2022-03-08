@@ -18,23 +18,27 @@ app.get('/', function(req, res) {
 });
 
 // Your first API endpoint
-app.get('/api/hello', function(req, res) {
-  res.json({ greeting: 'hello API' });
+app.get('/api/shorturl/:shorturl', (req, res) => {
+  console.log("in get " + req.params.shorturl)
 });
 
 app.use(async (req, res, next) => {
-  console.log(req.body.url)
   const options = {
     family: 6,
     hints: dns.ADDRCONFIG | dns.V4MAPPED,
   };
-  const hostname = req.body.url.replace(/^https?:\/\//, '')
+  console.log(req.body.url)
+  const hostname = (req.body.url) ? req.body.url.replace(/^https?:\/\//, '') : 'invalid'
   dns.lookup(hostname, options, (err, address, family) => {
-    console.log('address: %j family: IPv%s', address, family)
-    if (err) return res.json({ error: "invalid url"})
-    else next()
+    console.log("in dnsLookup " + hostname)
+    // if (err) return res.json({ error: "invalid url"})
+    // else next()
+    next()
+
   });
 }).post('/api/shorturl', (req, res) => {
+  console.log("in post " + req.body.url)
+  console.log(req.query)
   res.json({
     original_url: req.body.url,
     short_url: "hi"
