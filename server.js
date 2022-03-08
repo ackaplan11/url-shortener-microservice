@@ -31,8 +31,8 @@ app.use(async (req, res, next) => {
   const hostname = req.body.url.replace(/^https?:\/\//, '')
   dns.lookup(hostname, options, (err, address, family) => {
     console.log('address: %j family: IPv%s', address, family)
-    console.log(err)
-    next()
+    if (err) return res.json({ error: "invalid url"})
+    else next()
   });
 }).post('/api/shorturl', (req, res) => {
   res.json({
