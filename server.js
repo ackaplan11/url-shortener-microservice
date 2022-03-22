@@ -56,8 +56,8 @@ app.use((req, res, next) => {
   console.log("in post " + req.body.url)
   URL.countDocuments({}, (err, count) => {
     const url = new URL({ 
-      long: req.body.url,
-      short: parseInt(count + 1)
+      original_url: req.body.url,
+      short_url: parseInt(count + 1)
     });
     url.save()
       .then((url) => {
