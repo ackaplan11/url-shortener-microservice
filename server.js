@@ -10,6 +10,10 @@ mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopol
   .then(() => console.log("Connected"))
   .catch((err) => console.log(err));
 
+//create models
+const schema = require('./schema.js')
+const URL = mongoose.model('URL', schema.urlSchema)
+
 // Basic Configuration
 const port = process.env.PORT || 3000;
 
@@ -38,14 +42,22 @@ app.use((req, res, next) => {
     console.log("in dnsLookup " + hostname)
     if (err) return res.json({ error: "invalid url"})
     else next()
-    // next()
-
   });
 }).post('/api/shorturl', (req, res) => {
   console.log("in post " + req.body.url)
-  res.json({
-    original_url: req.body.url,
-    short_url: "hi"
+  URL.countDocuments({}, (err, count) => {
+    const url = new URL({ 
+      long: req.body.url,
+      short: count + 1
+    });
+    url.save()
+      .then((url) => {
+        return res.json(url)
+      })
+      .catch((err) => {
+        console.log(err)
+        return res.status(400).send('Bad Request')
+      })
   })
 })
 
