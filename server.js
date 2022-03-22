@@ -28,7 +28,7 @@ app.get('/', function(req, res) {
 
 // Your first API endpoint
 app.get('/api/shorturl/:shorturl', (req, res) => {
-  const shorturl = req.params.shorturl.toString()
+  const shorturl = req.params.shorturl
   URL.findOne({short: shorturl})
     .then((url) => {
       console.log(url.long)
@@ -57,7 +57,7 @@ app.use((req, res, next) => {
   URL.countDocuments({}, (err, count) => {
     const url = new URL({ 
       long: req.body.url,
-      short: count + 1
+      short: parseInt(count + 1)
     });
     url.save()
       .then((url) => {
