@@ -26,12 +26,12 @@ app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-// Your first API endpoint
+
 app.get('/api/shorturl/:shorturl', (req, res) => {
-  const shorturl = req.params.shorturl
-  URL.findOne({short: shorturl})
+  const short_url = req.params.shorturl
+  URL.findOne({short_url: short_url})
     .then((url) => {
-      console.log(url.long)
+      console.log(url.original_url)
       return res.status(301).redirect(url.original_url)
     })
     .catch((err) => {
