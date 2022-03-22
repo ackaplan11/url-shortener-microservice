@@ -32,7 +32,7 @@ app.get('/api/shorturl/:shorturl', (req, res) => {
   URL.findOne({short: shorturl})
     .then((url) => {
       console.log(url.long)
-      return res.status(301).redirect(url.long)
+      return res.status(301).redirect(url.original_url)
     })
     .catch((err) => {
       console.log(err)
