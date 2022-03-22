@@ -28,8 +28,17 @@ app.get('/', function(req, res) {
 
 // Your first API endpoint
 app.get('/api/shorturl/:shorturl', (req, res) => {
-  console.log("in get " + req.params.shorturl)
-});
+  const shorturl = req.params.shorturl.toString()
+  URL.findOne({short: shorturl})
+    .then((url) => {
+      console.log(url.long)
+      return res.status(301).redirect(url.long)
+    })
+    .catch((err) => {
+      console.log(err)
+      return res.status(400).send('Bad Request') 
+    })    
+})
 
 app.use((req, res, next) => {
   const options = {
