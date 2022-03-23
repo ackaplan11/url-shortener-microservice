@@ -6,8 +6,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser')
 const app = express();
 
-console.log(process.env.MONGO_URI)
-
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected"))
   .catch((err) => console.log(err));
@@ -73,7 +71,9 @@ function validateURL(req, res, next) {
     family: 6,
     hints: dns.ADDRCONFIG | dns.V4MAPPED,
   };
-  const hostname = (req.body.url) ? req.body.url.replace(/^https?:\/\//, '') : 'invalid'
+  const url = req.body.url
+  const dnsREGEX = new RegExp(/(?<=\/)(.*?)(?=\/)/g)
+  const hostname = (url.match(dnsREGEX)) ? url.match(dnsREGEX)[1] : 'invalid'  
   dns.lookup(hostname, options, (err, address, family) => {
     if (err) {
       console.error(err)
