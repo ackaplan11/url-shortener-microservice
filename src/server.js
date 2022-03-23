@@ -26,6 +26,10 @@ app.get('/', function(req, res) {
 //URL Shortener
 app.get('/api/shorturl/:shorturl', (req, res) => {
   const short_url = req.params.shorturl
+  if (short_url == 'undefined') {
+    console.log('Shorturl must be defined')
+    return res.status(400).send('Shorturl must be defined')
+  }
   URL.findOne({short_url: short_url})
     .then((url) => {
       console.log(url.original_url)
@@ -38,7 +42,6 @@ app.get('/api/shorturl/:shorturl', (req, res) => {
 })
 
 app.post('/api/shorturl', validateURL, (req, res) => {
-    console.log("in post " + req.body.url)
     URL.countDocuments({}, (err, count) => {
     const url = new URL({ 
       original_url: req.body.url,
@@ -46,10 +49,11 @@ app.post('/api/shorturl', validateURL, (req, res) => {
     });
     url.save()
       .then((url) => {
+        console.log('save successful')
         return res.json(url)
       })
       .catch((err) => {
-        console.log(err)
+        console.error(err)
         return res.status(400).send('Bad Request')
       })
   })
@@ -60,12 +64,19 @@ function validateURL(req, res, next) {
     family: 6,
     hints: dns.ADDRCONFIG | dns.V4MAPPED,
   };
-  console.log(req.body.url)
   const hostname = (req.body.url) ? req.body.url.replace(/^https?:\/\//, '') : 'invalid'
   dns.lookup(hostname, options, (err, address, family) => {
-    console.log("in dnsLookup " + hostname)
-    if (err) return res.json({ error: "invalid url"})
-    else next()
+    if (err) {
+      console.error(err)
+      return res.json({ error: "invalid url"})
+    } else {
+      console.log('-----')
+      console.log('hostname : ' + hostname)
+      console.log('address : ' + address)
+      console.log('family : ' + family)
+      console.log('-----')
+      next()
+    } 
   })
 }
 
