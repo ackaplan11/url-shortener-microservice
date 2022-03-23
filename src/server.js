@@ -37,21 +37,9 @@ app.get('/api/shorturl/:shorturl', (req, res) => {
     })    
 })
 
-app.use((req, res, next) => {
-  const options = {
-    family: 6,
-    hints: dns.ADDRCONFIG | dns.V4MAPPED,
-  };
-  console.log(req.body.url)
-  const hostname = (req.body.url) ? req.body.url.replace(/^https?:\/\//, '') : 'invalid'
-  dns.lookup(hostname, options, (err, address, family) => {
-    console.log("in dnsLookup " + hostname)
-    if (err) return res.json({ error: "invalid url"})
-    else next()
-  });
-}).post('/api/shorturl', (req, res) => {
-  console.log("in post " + req.body.url)
-  URL.countDocuments({}, (err, count) => {
+app.post('/api/shorturl', validateURL, (req, res) => {
+    console.log("in post " + req.body.url)
+    URL.countDocuments({}, (err, count) => {
     const url = new URL({ 
       original_url: req.body.url,
       short_url: parseInt(count + 1)
@@ -66,6 +54,20 @@ app.use((req, res, next) => {
       })
   })
 })
+
+function validateURL(req, res, next) {
+  const options = {
+    family: 6,
+    hints: dns.ADDRCONFIG | dns.V4MAPPED,
+  };
+  console.log(req.body.url)
+  const hostname = (req.body.url) ? req.body.url.replace(/^https?:\/\//, '') : 'invalid'
+  dns.lookup(hostname, options, (err, address, family) => {
+    console.log("in dnsLookup " + hostname)
+    if (err) return res.json({ error: "invalid url"})
+    else next()
+  })
+}
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
