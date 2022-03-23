@@ -42,21 +42,25 @@ app.get('/api/shorturl/:shorturl', (req, res) => {
 })
 
 app.post('/api/shorturl', validateURL, (req, res) => {
-    URL.countDocuments({}, (err, count) => {
-    const url = new URL({ 
-      original_url: req.body.url,
-      short_url: parseInt(count + 1)
-    });
-    url.save()
-      .then((url) => {
-        console.log('save successful')
-        return res.json(url)
-      })
+    URL.countDocuments()
+      .then((count)=> {
+        const url = new URL({ 
+          original_url: req.body.url,
+          short_url: parseInt(count + 1)
+        });
+        url.save()
+          .then((url) => {
+            console.log('save successful')
+            return res.json(url)
+          })
+          .catch((err) => {
+            console.error(err)
+            return res.status(400).send('Bad Request')
+          })})
       .catch((err) => {
         console.error(err)
-        return res.status(400).send('Bad Request')
+        return res.status(400).send('Could not retrieve document count')
       })
-  })
 })
 
 function validateURL(req, res, next) {
