@@ -15,13 +15,17 @@ const schema = require('./schema.js')
 const URL = mongoose.model('URL', schema.urlSchema)
 
 // Basic Configuration
-const port = process.env.PORT || 3000;
+
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use('/public', express.static(`${process.cwd()}/public`));
 app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
+
+const listener = app.listen(process.env.PORT || 3000, () => {
+  console.log('Your app is listening on port ' + listener.address().port)
+})
 
 //URL Shortener
 app.get('/api/shorturl/:shorturl', (req, res) => {
@@ -83,7 +87,3 @@ function validateURL(req, res, next) {
     } 
   })
 }
-
-app.listen(port, function() {
-  console.log(`Listening on port ${port}`);
-});
